@@ -14,7 +14,8 @@
   <link
     href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=Orbitron:wght@500;700;900&family=Outfit:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet">
-  <link rel="icon" href="fevicon-modified.png" <!-- Main Stylesheet -->
+  <link rel="icon" href="fevicon-modified.png">
+  <!-- Main Stylesheet -->
   <link rel="stylesheet" href="styles.css">
 
   <!-- Three.js WebGL 3D Engine & Loaders (CDN) -->
@@ -65,7 +66,7 @@
           <div class="input-wrapper">
             <span class="input-icon">👤</span>
             <input type="text" id="login-gamertag" class="glass-input auth-field" placeholder="e.g. CyberVanguard"
-              required maxlength="20" autocomplete="username">
+              maxlength="20" autocomplete="username">
           </div>
         </div>
 
@@ -77,7 +78,7 @@
           <div class="input-wrapper">
             <span class="input-icon">🔑</span>
             <input type="password" id="login-password" class="glass-input auth-field"
-              placeholder="Enter access passcode..." required autocomplete="current-password">
+              placeholder="Enter passcode (optional)..." autocomplete="current-password">
           </div>
         </div>
 
@@ -185,7 +186,7 @@
           </div>
 
           <!-- The Avatar Stage with Cyber Pedestal & 3D Three.js Canvas -->
-          <div class="avatar-canvas-wrapper">
+          <div class="avatar-canvas-wrapper" id="avatar-canvas-wrapper">
             <div class="pedestal-glow" id="pedestal-3d-glow" aria-hidden="true"></div>
 
             <!-- 3D WebGL Operative Canvas (Three.js) -->
@@ -194,7 +195,7 @@
             <!-- 3D Viewport Controls & Victory Trigger -->
             <div class="canvas-3d-controls-overlay">
               <div class="canvas-3d-hint font-arcade">
-                <span class="hint-icon">🔄</span> Drag to rotate • 🔍 Scroll to inspect
+                <span class="hint-icon">🔄</span> Drag to rotate • 🔍 Scroll to inspect • ⚡ Complete quests to level up
               </div>
               <div class="canvas-3d-actions-row">
                 <button id="btn-trigger-victory" class="glass-btn btn-victory-pose"
@@ -513,7 +514,7 @@
                 <select id="quest-difficulty-select" class="glass-select">
                   <option value="normal" data-xp="100">⚔️ Veteran (+100 XP)</option>
                   <option value="easy" data-xp="50">🌱 Apprentice (+50 XP)</option>
-                  <option value="boss" data-xp="250">🐉 Boss Quest (+250 XP)</option>
+                  <option value="legendary" data-xp="250">👑 Legendary (+250 XP)</option>
                 </select>
               </div>
               <div class="form-actions">

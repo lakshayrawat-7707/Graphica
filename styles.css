@@ -387,18 +387,33 @@ html, body {
   position: relative;
   display: flex;
   align-items: center;
+  width: 100%;
 }
 
 .input-icon {
   position: absolute;
-  left: 1rem;
-  font-size: 1rem;
+  left: 1.1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.15rem;
+  line-height: 1;
   pointer-events: none;
-  opacity: 0.7;
+  opacity: 0.75;
+  z-index: 2;
+  transition: opacity var(--transition-fast), filter var(--transition-fast), transform var(--transition-fast);
 }
 
-.auth-field {
-  padding-left: 2.8rem;
+.input-wrapper:focus-within .input-icon {
+  opacity: 1;
+  filter: drop-shadow(0 0 6px var(--accent-glow));
+  transform: translateY(-50%) scale(1.08);
+}
+
+.auth-field,
+.glass-input.auth-field,
+.input-wrapper .auth-field {
+  padding-left: 3.1rem !important;
+  padding-right: 1.2rem;
   height: 48px;
   font-size: 0.95rem;
 }
@@ -718,8 +733,8 @@ html, body {
 .avatar-canvas-wrapper {
   position: relative;
   width: 100%;
-  max-width: 320px;
-  height: 380px;
+  max-width: 380px;
+  height: 400px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -733,7 +748,7 @@ html, body {
 .pedestal-glow {
   position: absolute;
   bottom: 15px;
-  width: 220px;
+  width: 260px;
   height: 45px;
   background: radial-gradient(ellipse, var(--glow-primary, rgba(0, 210, 255, 0.45)) 0%, transparent 75%);
   filter: blur(14px);
@@ -2225,8 +2240,8 @@ html, body {
   transition: width var(--transition-fast);
 }
 
-.quest-card.boss-tier::before {
-  background: linear-gradient(to bottom, #ef4444, #f59e0b);
+.quest-card.legendary-tier::before {
+  background: linear-gradient(to bottom, #f59e0b, #ec4899);
 }
 
 .quest-card.veteran-tier::before {
@@ -2242,6 +2257,23 @@ html, body {
 
 .quest-card:hover::before {
   width: 5px;
+}
+
+.quest-card[draggable="true"] {
+  cursor: grab;
+}
+
+.quest-card.dragging {
+  opacity: 0.45;
+  transform: scale(0.98);
+  border: 1px dashed var(--neon-purple) !important;
+  cursor: grabbing;
+}
+
+.quest-column.drag-over {
+  border-color: var(--electric-blue) !important;
+  background: rgba(0, 210, 255, 0.08) !important;
+  box-shadow: 0 0 20px rgba(0, 210, 255, 0.25) !important;
 }
 
 .quest-check-btn {
@@ -2300,10 +2332,10 @@ html, body {
   border-radius: 6px;
 }
 
-.quest-card.boss-tier .quest-xp-pill {
-  color: #f87171;
-  background: rgba(239, 68, 68, 0.15);
-  border-color: rgba(239, 68, 68, 0.35);
+.quest-card.legendary-tier .quest-xp-pill {
+  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.35);
 }
 
 .quest-tier-pill {

@@ -363,9 +363,9 @@ const DEFAULT_MOCK_QUESTS = [
   {
     id: 'mock-1',
     title: 'Master C++ Dynamic Vectors & Memory Allocation',
-    difficulty: 'boss',
+    difficulty: 'legendary',
     xp: 250,
-    tierLabel: 'Boss Quest',
+    tierLabel: 'Legendary',
     createdAt: Date.now() - 3600000 * 4
   },
   {
@@ -379,9 +379,9 @@ const DEFAULT_MOCK_QUESTS = [
   {
     id: 'mock-3',
     title: 'Finish AIT OSS Club Open Source Contribution',
-    difficulty: 'boss',
+    difficulty: 'legendary',
     xp: 250,
-    tierLabel: 'Boss Quest',
+    tierLabel: 'Legendary',
     createdAt: Date.now() - 3600000 * 2
   },
   {
@@ -483,7 +483,15 @@ const StorageManager = {
   loadActiveQuests() {
     try {
       const raw = localStorage.getItem(STORAGE_KEYS.ACTIVE_QUESTS);
-      if (raw) return JSON.parse(raw);
+      if (raw) {
+        const list = JSON.parse(raw);
+        return list.map(q => {
+          if (q.difficulty === 'boss') {
+            return { ...q, difficulty: 'legendary', tierLabel: 'Legendary' };
+          }
+          return q;
+        });
+      }
       this.saveActiveQuests(DEFAULT_MOCK_QUESTS);
       return [...DEFAULT_MOCK_QUESTS];
     } catch (e) {
@@ -500,7 +508,16 @@ const StorageManager = {
   loadCompletedQuests() {
     try {
       const raw = localStorage.getItem(STORAGE_KEYS.COMPLETED_QUESTS);
-      return raw ? JSON.parse(raw) : [];
+      if (raw) {
+        const list = JSON.parse(raw);
+        return list.map(q => {
+          if (q.difficulty === 'boss') {
+            return { ...q, difficulty: 'legendary', tierLabel: 'Legendary' };
+          }
+          return q;
+        });
+      }
+      return [];
     } catch (e) {
       return [];
     }
@@ -589,6 +606,14 @@ class AuthManager {
 
     if (this.loginForm) {
       this.loginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        this.handleLogin();
+      });
+    }
+
+    const loginBtn = document.getElementById('login-submit-btn');
+    if (loginBtn) {
+      loginBtn.addEventListener('click', (e) => {
         e.preventDefault();
         this.handleLogin();
       });
@@ -1571,7 +1596,7 @@ class Character3DEngine {
     // Intelligent Dynamic Equip Manager
     this.dynamicEquipManager = new DynamicEquipManager(this);
 
-    // Rig joints and sockets
+    // Rig joints and sockets (Player Operative)
     this.characterGroup = null;
     this.spineBone = null;
     this.chestBone = null;
@@ -1619,9 +1644,9 @@ class Character3DEngine {
     // 1. Scene Setup
     this.scene = new THREE.Scene();
 
-    // 2. Camera Setup
-    const width = this.canvas.parentElement ? this.canvas.parentElement.clientWidth : 320;
-    const height = this.canvas.parentElement ? this.canvas.parentElement.clientHeight : 380;
+    // 2. Camera Setup (Centered single-character perspective)
+    const width = this.canvas.parentElement ? this.canvas.parentElement.clientWidth : 380;
+    const height = this.canvas.parentElement ? this.canvas.parentElement.clientHeight : 400;
     const aspect = width / (height || 1);
 
     this.camera = new THREE.PerspectiveCamera(38, aspect, 0.1, 50);
@@ -1656,7 +1681,7 @@ class Character3DEngine {
       this.controls.target.set(0, 0.95, 0);
       this.controls.minPolarAngle = Math.PI / 2.7;
       this.controls.maxPolarAngle = Math.PI / 1.78;
-      this.controls.minDistance = 2.8;
+      this.controls.minDistance = 2.4;
       this.controls.maxDistance = 6.0;
       this.controls.enablePan = false;
     }
@@ -1686,8 +1711,8 @@ class Character3DEngine {
     // 10. Apply Active Material Vibe
     this.applyVibe(this.activeVibe, false);
 
-    // 10.1 Automatically fetch and load the 3D model ('./lord.glb') on page initialization
-    this.autoLoadModel('./lord.glb');
+    // 10.1 Automatically fetch and load the 3D model ('./assets/lord.glb') on page initialization
+    this.autoLoadModel('./assets/lord.glb');
 
     // 11. Handle Responsive Resize
     this.setupResizeObserver();
@@ -1698,37 +1723,37 @@ class Character3DEngine {
 
   setupLighting() {
     // Key Directional Light with soft shadows
-    this.dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
-    this.dirLight.position.set(2.5, 4.5, 3.2);
+    this.dirLight = new THREE.DirectionalLight(0xffffff, 1.3);
+    this.dirLight.position.set(2.0, 4.5, 3.2);
     this.dirLight.castShadow = true;
     this.dirLight.shadow.mapSize.width = 1024;
     this.dirLight.shadow.mapSize.height = 1024;
     this.dirLight.shadow.camera.near = 0.5;
     this.dirLight.shadow.camera.far = 10;
-    this.dirLight.shadow.camera.left = -2;
-    this.dirLight.shadow.camera.right = 2;
-    this.dirLight.shadow.camera.top = 2.5;
+    this.dirLight.shadow.camera.left = -2.2;
+    this.dirLight.shadow.camera.right = 2.2;
+    this.dirLight.shadow.camera.top = 2.6;
     this.dirLight.shadow.camera.bottom = -0.5;
     this.dirLight.shadow.bias = -0.0008;
     this.scene.add(this.dirLight);
 
-    // Left Neon Rim Light
-    this.rimLightLeft = new THREE.PointLight(0x00d2ff, 2.6, 9);
+    // Left Neon Cyan Rim Light (Player Operative illumination)
+    this.rimLightLeft = new THREE.PointLight(0x00d2ff, 2.8, 9);
     this.rimLightLeft.position.set(-2.6, 2.0, -1.0);
     this.scene.add(this.rimLightLeft);
 
-    // Right Neon Rim Light
-    this.rimLightRight = new THREE.PointLight(0xff007f, 2.6, 9);
+    // Right Neon Purple Rim Light
+    this.rimLightRight = new THREE.PointLight(0x8a2be2, 2.8, 9);
     this.rimLightRight.position.set(2.6, 2.0, -1.0);
     this.scene.add(this.rimLightRight);
 
-    // Pedestal Upward Bounce Light
+    // Arena Floor Bounce Light
     this.pedestalLight = new THREE.PointLight(0x8a2be2, 2.4, 6);
     this.pedestalLight.position.set(0, -0.15, 0.4);
     this.scene.add(this.pedestalLight);
 
     // Ambient Fill Light
-    this.ambLight = new THREE.AmbientLight(0x181a28, 0.9);
+    this.ambLight = new THREE.AmbientLight(0x181a28, 1.0);
     this.scene.add(this.ambLight);
   }
 
@@ -1853,7 +1878,8 @@ class Character3DEngine {
 
   buildOperativeRig() {
     this.characterGroup = new THREE.Group();
-    this.characterGroup.position.y = 0;
+    this.characterGroup.position.set(0, 0, 0);
+    this.characterGroup.rotation.y = 0;
 
     // --- 1. PELVIS & UNDERSUIT ---
     const pelvisGeo = new THREE.BoxGeometry(0.42, 0.22, 0.28);
@@ -2178,13 +2204,13 @@ class Character3DEngine {
   }
 
   // =========================================================================
-  // AUTOMATED 3D MODEL LOADER ('./lord.glb') & DYNAMIC AUTO-MAPPER
+  // AUTOMATED 3D MODEL LOADER ('./assets/lord.glb') & DYNAMIC AUTO-MAPPER
   // =========================================================================
-  autoLoadModel(modelUrl = './lord.glb') {
+  autoLoadModel(modelUrl = './assets/lord.glb') {
     this.loadGLBModel(modelUrl);
   }
 
-  loadGLBModel(fileOrUrl = './lord.glb') {
+  loadGLBModel(fileOrUrl = './assets/lord.glb') {
     if (!window.THREE || !window.THREE.GLTFLoader) {
       console.warn('⚠️ [Character3DEngine] Three.js or GLTFLoader is not available. Using procedural operative rig.');
       return;
@@ -2217,9 +2243,11 @@ class Character3DEngine {
         this.loadedGLBScene.scale.set(scale, scale, scale);
       }
 
+      // Position Player centered (position.x = 0), facing forward
       this.loadedGLBScene.position.x = -center.x * (this.loadedGLBScene.scale.x || 1);
       this.loadedGLBScene.position.y = 0;
       this.loadedGLBScene.position.z = -center.z * (this.loadedGLBScene.scale.z || 1);
+      this.loadedGLBScene.rotation.y = 0;
 
       // Cast and receive shadows on all loaded meshes
       this.loadedGLBScene.traverse((child) => {
@@ -2584,6 +2612,7 @@ class AvatarAndVaultManager {
 
     // Initialize High-Fidelity 3D WebGL Operative Engine
     this.character3DEngine = new Character3DEngine('character-3d-canvas', this.playerManager);
+    window.character3DEngine = this.character3DEngine;
 
     // Vault DOM Elements
     this.vaultGridEl = document.getElementById('vault-items-grid');
@@ -3412,6 +3441,29 @@ class QuestManager {
         this.render();
       });
     }
+
+    // Drag-and-Drop: Allow dragging tasks to "Completed" to slay them
+    if (this.completedListEl) {
+      const completedCol = this.completedListEl.closest('.quest-column') || this.completedListEl;
+      completedCol.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        completedCol.classList.add('drag-over');
+      });
+      completedCol.addEventListener('dragleave', (e) => {
+        if (!completedCol.contains(e.relatedTarget)) {
+          completedCol.classList.remove('drag-over');
+        }
+      });
+      completedCol.addEventListener('drop', (e) => {
+        e.preventDefault();
+        completedCol.classList.remove('drag-over');
+        const questId = e.dataTransfer.getData('text/plain');
+        if (questId) {
+          this.completeQuest(questId);
+        }
+      });
+    }
   }
 
   handleAddQuest() {
@@ -3425,9 +3477,9 @@ class QuestManager {
     if (difficulty === 'easy') {
       xp = 50;
       tierLabel = 'Apprentice';
-    } else if (difficulty === 'boss') {
+    } else if (difficulty === 'legendary') {
       xp = 250;
-      tierLabel = 'Boss Quest';
+      tierLabel = 'Legendary';
     }
 
     const newQuest = {
@@ -3522,6 +3574,17 @@ class QuestManager {
           card.className = `quest-card ${quest.difficulty}-tier`;
           card.setAttribute('role', 'listitem');
           card.dataset.id = quest.id;
+
+          // Drag-and-Drop capability on active quest cards
+          card.setAttribute('draggable', 'true');
+          card.addEventListener('dragstart', (e) => {
+            e.dataTransfer.setData('text/plain', quest.id);
+            e.dataTransfer.effectAllowed = 'move';
+            card.classList.add('dragging');
+          });
+          card.addEventListener('dragend', () => {
+            card.classList.remove('dragging');
+          });
 
           card.innerHTML = `
             <button class="quest-check-btn" aria-label="Slay Quest and claim XP" title="Slay Quest (+${quest.xp} XP)">
