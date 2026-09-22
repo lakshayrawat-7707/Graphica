@@ -14,7 +14,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -39,10 +39,10 @@ export default async function handler(req, res) {
 
     const data = await response.json();
     let textContent = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    
+
     // Clean response (removes markdown code blocks if any)
     textContent = textContent.replace(/```json/gi, '').replace(/```/g, '').trim();
-    
+
     try {
       const quests = JSON.parse(textContent);
       return res.status(200).json(quests);
