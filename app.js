@@ -3877,3 +3877,85 @@ document.addEventListener('DOMContentLoaded', () => {
 
   console.log('⚔️ QuestLog - OSS Edition with Weapons Vault, Dynamic Themes & Free Fire VFX initialized.');
 });
+
+/* ============================================================================
+   12. AI ARCHITECT - TACTICAL QUEST GENERATOR
+   ============================================================================ */
+async function generateTacticalQuests() {
+  const inputEl = document.getElementById('ai-goal-input');
+  const statusEl = document.getElementById('ai-loading-status');
+  const goal = inputEl.value.trim();
+
+  if (!goal) {
+    statusEl.textContent = 'ERROR: Objective cannot be empty.';
+    statusEl.style.color = '#f87171';
+    return;
+  }
+
+  statusEl.textContent = 'Establishing Comm-link...';
+  statusEl.style.color = '#4ade80';
+
+  try {
+    const response = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ goal })
+    });
+
+    if (!response.ok) throw new Error(`Server responded with ${response.status}`);
+
+    const quests = await response.json();
+    statusEl.textContent = 'Mission Decomposed Successfully.';
+    inputEl.value = '';
+    
+    setTimeout(() => { statusEl.textContent = ''; }, 3000);
+
+    renderQuestsToBoard(quests);
+  } catch (error) {
+    console.error('AI Generation Error:', error);
+    statusEl.textContent = 'ERROR: Comm-link failed.';
+    statusEl.style.color = '#f87171';
+  }
+}
+
+function renderQuestsToBoard(quests) {
+  const activeList = document.getElementById('active-quests-list');
+  if (!activeList) return;
+
+  quests.forEach(quest => {
+    const diffLower = (quest.difficulty || 'MEDIUM').toLowerCase();
+    let mappedDiff = 'normal';
+    let tierLabel = 'Veteran';
+    let baseXP = 100;
+    
+    if (diffLower === 'easy') { mappedDiff = 'easy'; tierLabel = 'Apprentice'; baseXP = 50; }
+    else if (diffLower === 'hard') { mappedDiff = 'legendary'; tierLabel = 'Legendary'; baseXP = 250; }
+    
+    const xpReward = quest.xp_reward || baseXP;
+    
+    const cardHTML = `
+      <div class="quest-item-card glass-panel-nested active-quest-card" style="margin-bottom: 1rem; padding: 1rem; border: 1px solid rgba(0, 210, 255, 0.4); border-left: 4px solid var(--neon-purple); border-radius: 12px; background: rgba(18, 18, 34, 0.85); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);">
+        <div class="quest-card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem;">
+          <div class="quest-tier-pill diff-${mappedDiff}" style="font-family: var(--font-arcade); font-size: 0.7rem; font-weight: 700; color: var(--electric-blue); background: rgba(0, 210, 255, 0.1); padding: 0.25rem 0.6rem; border-radius: 6px; border: 1px solid rgba(0, 210, 255, 0.25);">
+            <span class="tier-dot"></span>
+            ${tierLabel} (+${xpReward} XP)
+          </div>
+          <div class="quest-actions">
+            <span style="font-family: var(--font-arcade); font-size: 0.7rem; color: var(--neon-purple-bright); background: rgba(138, 43, 226, 0.15); padding: 0.2rem 0.5rem; border-radius: 4px; border: 1px solid rgba(138, 43, 226, 0.4);">AI GEN</span>
+          </div>
+        </div>
+        <div class="quest-card-body" style="margin-bottom: 0.8rem;">
+          <h4 class="quest-title" style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 0.3rem;">${quest.title}</h4>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.4;">${quest.description}</p>
+        </div>
+        <div class="quest-card-footer" style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 0.8rem;">
+          <span class="quest-time font-mono" style="font-size: 0.75rem; color: var(--text-muted);">~${quest.estimated_time_minutes || 30}m</span>
+          <button class="glass-btn btn-accent-glow" style="font-size: 0.75rem; padding: 0.3rem 0.7rem;" onclick="this.closest('.quest-item-card').remove();">Accept</button>
+        </div>
+      </div>
+    `;
+    
+    activeList.insertAdjacentHTML('beforeend', cardHTML);
+  });
+}
+

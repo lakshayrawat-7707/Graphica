@@ -525,6 +525,17 @@
           </form>
         </div>
 
+        <!-- AI Architect Panel -->
+        <div class="ai-architect-panel" style="margin-bottom: 1.5rem; padding: 1.2rem; background: rgba(138, 43, 226, 0.05); border: 1px solid rgba(138, 43, 226, 0.4); border-radius: var(--card-radius); display: flex; flex-direction: column; gap: 0.8rem; box-shadow: 0 0 15px rgba(138, 43, 226, 0.15);">
+          <div style="display: flex; gap: 0.8rem; flex-wrap: wrap;">
+            <input type="text" id="ai-goal-input" class="glass-input" placeholder="Enter target objective (e.g., Learn full-stack React)..." style="flex: 1; min-width: 200px;">
+            <button onclick="generateTacticalQuests()" class="glow-action-btn btn-primary-grind" style="padding: 0 1.2rem; border-radius: 8px;">
+              <span class="btn-icon">🧠</span> DECOMPOSE MISSION
+            </button>
+          </div>
+          <div id="ai-loading-status" style="color: #4ade80; margin-top: 5px; font-family: var(--font-arcade); font-size: 0.8rem; min-height: 1.2em;"></div>
+        </div>
+
         <!-- 2-Column Board: Active & Completed -->
         <div class="quest-columns-container">
           <!-- Column 1: Active Quests -->
